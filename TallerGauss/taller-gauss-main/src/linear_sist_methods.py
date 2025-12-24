@@ -46,6 +46,9 @@ def eliminacion_gaussiana(A: np.ndarray | list[list[float | int]]) -> np.ndarray
 
     suma_count = 0
     resta_count = 0
+    mult_count = 0
+    div_count = 0
+    intercambio_count = 0
 
     for i in range(0, n - 1):  # loop por columna
         # --- encontrar pivote
@@ -65,12 +68,15 @@ def eliminacion_gaussiana(A: np.ndarray | list[list[float | int]]) -> np.ndarray
             _aux = A[i, :].copy()
             A[i, :] = A[p, :].copy()
             A[p, :] = _aux
+            intercambio_count += 1
         # --- Eliminación: loop por fila
         for j in range(i + 1, n):
             m = A[j, i] / A[i, i]
-            # Para cada elemento en la fila, se realiza una resta
+            div_count += 1  # División para obtener el multiplicador
+            # Para cada elemento en la fila, se realiza una multiplicación y una resta
+            mult_count += A[j, i:].size  # m * A[i, i:] para cada elemento
+            resta_count += A[j, i:].size  # resta para cada elemento
             A[j, i:] = A[j, i:] - m * A[i, i:]
-            resta_count += A[j, i:].size
         logging.info(f"\n{A}")
 
     if A[n - 1, n - 1] == 0:
@@ -79,16 +85,19 @@ def eliminacion_gaussiana(A: np.ndarray | list[list[float | int]]) -> np.ndarray
     # --- Sustitución hacia atrás
     solucion = np.zeros(n)
     solucion[n - 1] = A[n - 1, n] / A[n - 1, n - 1]
+    div_count += 1  # División para la última variable
 
     for i in range(n - 2, -1, -1):
         suma = 0
         for j in range(i + 1, n):
             suma += A[i, j] * solucion[j]
-            suma_count += 1  # cada suma en sustitución hacia atrás
+            mult_count += 1  # multiplicación
+            suma_count += 1  # suma
         solucion[i] = (A[i, n] - suma) / A[i, i]
         resta_count += 1  # la resta en la sustitución
+        div_count += 1  # división final
 
-    return solucion, suma_count, resta_count
+    return solucion, suma_count, resta_count, mult_count, div_count, intercambio_count
 
 
 # ####################################################################
