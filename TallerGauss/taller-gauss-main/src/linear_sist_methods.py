@@ -59,7 +59,7 @@ def eliminacion_gaussiana(A: np.ndarray | list[list[float | int]]) -> np.ndarray
             if p is None:
                 p = pi
                 continue
-            if abs(A[pi, i]) < abs(A[p, i]):
+            if abs(A[pi, i]) > abs(A[p, i]):
                 p = pi
         if p is None:
             raise ValueError("No existe solución única.")
